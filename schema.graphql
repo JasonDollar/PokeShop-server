@@ -1,0 +1,37 @@
+type Query {
+  me(email: String!): User!
+  pokemons(skip: Int!): [Pokemon!]!
+}
+
+type Mutation {
+  createUser(data: CreateUserInput!): AuthPayload!
+  login(data: LoginInput!): AuthPayload!
+}
+
+type User {
+  name: String!
+  email: String!,
+  password: String!
+}
+
+input CreateUserInput {
+  name: String! 
+  email: String!
+  password: String!
+}
+
+type AuthPayload {
+  user: User!
+  token: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Pokemon {
+  id: Int!
+  name: String!
+  url: String!
+}
