@@ -25,9 +25,17 @@ module.exports = {
           url,
         })
       })
-      // console.log(JSON.stringify(pokeList, undefined, 2))
       return pokeList
       // https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20
+    },
+    async pokemon(parent, args, ctx, info) {
+      const pokemonRes = await P.resource(`/api/v2/pokemon/${args.id}`)
+      // console.log(pokemonRes)
+      return {
+        id: pokemonRes.id,
+        name: pokemonRes.name,
+        url: pokemonRes.sprites.front_default,
+      }
     },
   },
 }

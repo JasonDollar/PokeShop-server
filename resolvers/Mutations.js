@@ -20,8 +20,7 @@ module.exports = {
       }
     },
     async login(parent, args, ctx, info) {
-      console.log(ctx.request.request.headers.authorization)
-      // console.log(ctx.request.connection.context.Authorization)
+      // console.log(ctx.request.request.headers.authorization)
       const { email, password } = args.data
       const user = await User.findOne({ email })
       if (!user) {

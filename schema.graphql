@@ -1,6 +1,7 @@
 type Query {
   me(email: String!): User!
   pokemons(skip: Int!): [Pokemon!]!
+  pokemon(id: ID!): Pokemon
 }
 
 type Mutation {
@@ -31,7 +32,7 @@ input LoginInput {
 }
 
 type Pokemon {
-  id: Int!
+  id: ID!
   name: String!
   url: String!
 }
