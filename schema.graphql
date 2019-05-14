@@ -1,7 +1,8 @@
 type Query {
   me(email: String!): User!
   pokemons(skip: Int!): [Pokemon!]!
-  pokemon(id: ID!): Pokemon
+  pokemon(id: ID!): PokemonDetail
+  pokeType(id: ID!): PokeType
 }
 
 type Mutation {
@@ -35,4 +36,20 @@ type Pokemon {
   id: ID!
   name: String!
   url: String!
+  image: String!
+}
+
+type PokemonDetail {
+  id: ID!
+  name: String!
+  url: String!
+  image: String!
+  pokeType: [PokeType!]!
+}
+
+type PokeType {
+  id: ID!
+  name: String!
+  url: String!
+  pokemon: [Pokemon!]!
 }
