@@ -1,5 +1,5 @@
 type Query {
-  me(email: String!): User!
+  me: User!
   pokemons(skip: Int!): [Pokemon!]!
   pokemon(id: ID!): PokemonDetail
   pokeType(id: ID!): PokeType

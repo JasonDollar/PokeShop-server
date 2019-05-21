@@ -1,6 +1,8 @@
 const { GraphQLServer } = require('graphql-yoga') 
 const mongoose = require('mongoose')
-const {mongoURI} = require('./config/keys.js')
+const jwt = require('jsonwebtoken')
+require('dotenv').config({ path: '.env' })
+const { mongoURI } = require('./config/keys.js')
 const resolvers = require('./resolvers')
 
 
@@ -12,6 +14,16 @@ const server = new GraphQLServer({
       request,
     }
   },
+})
+
+server.express.use((req, res, next) => {
+  const token = req.headers.authorization ? req.headers.authorization.replace('Bearer ', '') : ''
+  if (token) {
+    const { userId } = jwt.verify(token, process.env.APP_SECRET)
+    console.log(userId)
+    req.userId = userId
+  }
+  next()
 })
 
 mongoose.connect(mongoURI, { useNewUrlParser: true })

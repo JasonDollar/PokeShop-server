@@ -6,7 +6,8 @@ const P = new Pokedex()
 module.exports = {
   Query: {
     async me(parent, args, ctx, info) {
-      const me = await User.findOne({ email: args.email })
+      const { userId } = ctx.request.request
+      const me = await User.findOne({ _id: userId })
       if (!me) {
         throw new Error('No user found')
       }
@@ -23,21 +24,24 @@ module.exports = {
           id: pokemonId,
           name: item.name,
           image,
-          url: item.url
+          url: item.url,
         })
       })
       return pokeList
       // https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20
     },
     async pokemon(parent, args, ctx, info) {
+      const token = ctx.request.request.userId
+      // console.log(ctx.request.request.headers.authorization)
+      console.log(token)
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.id}`)
-      // console.log(pokemonRes.types[0].type)
+      // TODO maybe implement edges
       const pokeType = []
-      console.log(pokemonRes.sprites.front_default);
+      // console.log(pokemonRes.sprites.front_default)
       pokemonRes.types.map(item => {
         pokeType.push({
           ...item.type,
-          id: item.type.url.replace('https://pokeapi.co/api/v2/type/', '').replace('/', '')
+          id: item.type.url.replace('https://pokeapi.co/api/v2/type/', '').replace('/', ''),
         })
       })
       return {
@@ -45,14 +49,14 @@ module.exports = {
         name: pokemonRes.name,
         url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
         image: pokemonRes.sprites.front_default,
-        pokeType
+        pokeType,
       }
     },
     async pokeType(parent, args, ctx, info) {
       const typeRes = await P.resource(`/api/v2/type/${args.id}`)
       const pokemon = typeRes.pokemon
         .map(item => {
-          console.log(item);
+          // console.log(item)
           
           const pokemonId = item.pokemon.url.replace('https://pokeapi.co/api/v2/pokemon/', '').replace('/', '')
           if (pokemonId > 810) return
@@ -60,20 +64,20 @@ module.exports = {
             id: pokemonId,
             name: item.pokemon.name,
             url: item.pokemon.url,
-            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`
+            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`,
           }
         })
         .filter(item => item !== undefined)
         
 
-      console.log(typeRes.pokemon[0].pokemon);
+      // console.log(typeRes.pokemon[0].pokemon)
       const type = {
         id: typeRes.id,
         name: typeRes.name,
         url: `https://pokeapi.co/api/v2/type/${args.id}`,
-        pokemon
+        pokemon,
       }
       return type
-    }
+    },
   },
 }

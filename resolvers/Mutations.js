@@ -8,7 +8,7 @@ module.exports = {
       const { name, email, password } = args.data
       const user = await User.findOne({ email })
       if (user) {
-        throw new Error('User alreadyn exists')
+        throw new Error('User already exists')
       }
       const hashedPassword = await bcrypt.hash(password, 10)
       const newUser = new User({ name, email, password: hashedPassword })
@@ -20,7 +20,6 @@ module.exports = {
       }
     },
     async login(parent, args, ctx, info) {
-      // console.log(ctx.request.request.headers.authorization)
       const { email, password } = args.data
       const user = await User.findOne({ email })
       if (!user) {
