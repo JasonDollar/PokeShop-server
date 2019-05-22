@@ -1,19 +1,24 @@
 type Query {
   me: User!
+  user(userId: ID!): User
   pokemons(skip: Int!): [Pokemon!]!
   pokemon(id: ID!): PokemonDetail
   pokeType(id: ID!): PokeType
+  pokemonOffers: [PokemonOffer!]
+  pokemonOffer(id: ID!): PokemonOffer
 }
 
 type Mutation {
   createUser(data: CreateUserInput!): AuthPayload!
   login(data: LoginInput!): AuthPayload!
+  sellPokemon(data: SellPokemonInput!): PokemonOffer!
 }
 
 type User {
+  id: ID!
   name: String!
-  email: String!,
-  password: String!
+  email: String!
+  offers: [PokemonOffer!]
 }
 
 input CreateUserInput {
@@ -52,4 +57,18 @@ type PokeType {
   name: String!
   url: String!
   pokemon: [Pokemon!]!
+}
+
+input SellPokemonInput {
+  name: String!
+  price: Int!
+}
+
+type PokemonOffer {
+  id: ID!
+  name: String!
+  image: String!
+  price: Int!
+  pokemonId: Int!
+  seller: User!
 }

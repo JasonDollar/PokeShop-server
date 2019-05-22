@@ -2092,6 +2092,13 @@ pokedex-promise-v2@^3.1.1:
     es6-promise "^3.2.1"
     memory-cache "^0.1.6"
 
+pokemon@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/pokemon/-/pokemon-2.0.0.tgz#bf9c4f73ca4615df95a407f881e983ea5fb291ad"
+  integrity sha512-x+c9qNrB5y+2Ltt4mQGG56Rw6AvnzxhRm7/DRX9nSLjurTy+R7gMg3vUxzjJK2AhnaoQeFs3NPyK5fwnM3kVWg==
+  dependencies:
+    unique-random-array "^2.0.0"
+
 posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
@@ -2709,6 +2716,18 @@ union-value@^1.0.0:
     get-value "^2.0.6"
     is-extendable "^0.1.1"
     set-value "^0.4.3"
+
+unique-random-array@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/unique-random-array/-/unique-random-array-2.0.0.tgz#9e639b1a9dc141e97350a6fc6f17da4b0717b1ad"
+  integrity sha512-xR87O95fZ7hljw84J8r1YDXrvffPLWN513BNOP4Bv0KcgG5dyEUrHwsvP7mVAOKg4Y80uqRbpUk0GKr8il70qg==
+  dependencies:
+    unique-random "^2.1.0"
+
+unique-random@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/unique-random/-/unique-random-2.1.0.tgz#7a8413da5176d028567168b57125ac5c0cec5c25"
+  integrity sha512-iQ1ZgWac3b8YxGThecQFRQiqgk6xFERRwHZIWeVVsqlbmgCRl0PY13R4mUkodNgctmg5b5odG1nyW/IbOxQTqg==
 
 unique-string@^1.0.0:
   version "1.0.0"

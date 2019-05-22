@@ -1,17 +1,40 @@
-const Pokedex = require('pokedex-promise-v2')
+const P = require('../utils/pokedex')
 const User = require('../models/User')
+const PokemonOffer = require('../models/PokemonOffer')
+const getUserId = require('../utils/getUserId')
 
-const P = new Pokedex()
+
 
 module.exports = {
   Query: {
     async me(parent, args, ctx, info) {
       const { userId } = ctx.request.request
       const me = await User.findOne({ _id: userId })
+      await me.populate('offers').execPopulate()
+      // console.log(me.offers)
       if (!me) {
         throw new Error('No user found')
       }
-      return me
+      return {
+        id: me._id,
+        name: me.name,
+        email: me.email,
+        offers: me.offers,
+      }
+    },
+    async user(parent, args, ctx, info) {
+      const user = await User.findOne({ _id: args.userId })
+      await user.populate('offers').execPopulate()
+      // console.log(user.offers)
+      if (!user) {
+        throw new Error('No user found')
+      }
+      return {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        offers: user.offers,
+      }
     },
     async pokemons(parent, { skip = 0 }, ctx, info) {
       const pokemonRes = await P.resource(`/api/v2/pokemon/?offset=${skip}&limit=10`)
@@ -31,9 +54,9 @@ module.exports = {
       // https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20
     },
     async pokemon(parent, args, ctx, info) {
-      const token = ctx.request.request.userId
+      const token = getUserId(ctx)
       // console.log(ctx.request.request.headers.authorization)
-      console.log(token)
+      // console.log(token)
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.id}`)
       // TODO maybe implement edges
       const pokeType = []
@@ -78,6 +101,16 @@ module.exports = {
         pokemon,
       }
       return type
+    },
+    async pokemonOffers(parent, args, ctx, info) {
+      const pokemonOffers = await PokemonOffer.find()
+      return pokemonOffers
+    },
+    async pokemonOffer(parent, args, ctx, info) {
+      const pokemonOffer = await PokemonOffer.findOne({ _id: args.id })
+      await pokemonOffer.populate('seller').execPopulate()
+      pokemonOffer.id = pokemonOffer._id
+      return pokemonOffer
     },
   },
 }
