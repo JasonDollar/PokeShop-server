@@ -67,8 +67,7 @@ input SellPokemonInput {
 type PokemonOffer {
   id: ID!
   name: String!
-  image: String!
+  pokemon: Pokemon!
   price: Int!
-  pokemonId: Int!
   seller: User!
 }

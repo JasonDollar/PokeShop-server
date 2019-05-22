@@ -9,18 +9,28 @@ const pokemonSchema = new Schema({
     type: Number,
     required: true,
   },
-  pokemonId: {
-    type: Number,
-    required: true,
-  },
-  image: {
-    type: String,
-    required: true,
-  },
   seller: {
     type: Schema.Types.ObjectId,
     ref: 'user',
     required: true,
+  },
+  pokemon: {
+    id: {
+      type: Number,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
   },
 })
 

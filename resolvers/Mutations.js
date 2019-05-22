@@ -48,9 +48,13 @@ module.exports = {
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.data.name}`)
       const pokemonOffer = new PokemonOffer({
         ...args.data,
-        pokemonId: pokemonRes.id,
-        image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonRes.id}.png`,
         seller: userId,
+        pokemon: {
+          id: pokemonRes.id,
+          name: pokemonRes.name,
+          url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
+          image: pokemonRes.sprites.front_default,
+        },
       })
       const saved = await pokemonOffer.save()
       await saved.populate('seller').execPopulate()
