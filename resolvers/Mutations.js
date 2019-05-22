@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const pokemon = require('pokemon')
 const User = require('../models/User')
+const Wallet = require('../models/Wallet')
 const PokemonOffer = require('../models/PokemonOffer')
 const generateToken = require('../utils/generateToken')
 const getUserId = require('../utils/getUserId')
@@ -17,7 +18,9 @@ module.exports = {
       }
       const hashedPassword = await bcrypt.hash(password, 10)
       const newUser = new User({ name, email, password: hashedPassword })
-      await newUser.save()
+      const { _id: id } = await newUser.save()
+      const wallet = new Wallet({ owner: id })
+      await wallet.save()
       const token = generateToken(newUser._id, email)
       return {
         user: newUser,
