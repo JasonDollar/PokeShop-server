@@ -142,10 +142,10 @@ module.exports = {
     },
     async userCart(parent, args, ctx, info) {
       const { userId } = ctx.request.request
-      console.log(userId)
+      // console.log(userId)
       const cart = await CartItem.find({ user: userId }).populate('pokemon')
 
-      console.log(JSON.stringify(cart, null, 2))
+      // console.log(JSON.stringify(cart, null, 2))
       return cart
     },
   },

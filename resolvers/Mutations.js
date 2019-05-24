@@ -91,5 +91,14 @@ module.exports = {
       await savedNewCartItem.populate('user').execPopulate()
       return savedNewCartItem
     },
+    async removeFromCart(parent, args, ctx, info) {
+      const { id: cartItemId } = args
+      const userId = getUserId(ctx)
+      if (!userId) {
+        throw new Error('You must be logged in')
+      }
+      const cartItem = await CartItem.findByIdAndDelete(cartItemId)
+      return cartItem
+    },
   },
 }
