@@ -35,6 +35,12 @@ userSchema.virtual('wallet', {
   foreignField: 'owner',
 })
 
+userSchema.virtual('cart', {
+  ref: 'cartitem',
+  localField: '_id',
+  foreignField: 'user',
+})
+
 const User = model('user', userSchema)
 
 module.exports = User

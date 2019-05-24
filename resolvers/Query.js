@@ -2,6 +2,7 @@ const uuid = require('uuid/v4')
 const P = require('../utils/pokedex')
 const User = require('../models/User')
 const Wallet = require('../models/Wallet')
+const CartItem = require('../models/CartItem')
 const PokemonOffer = require('../models/PokemonOffer')
 const getUserId = require('../utils/getUserId')
 const {
@@ -15,22 +16,30 @@ module.exports = {
     async me(parent, args, ctx, info) {
       const { userId } = ctx.request.request
       const me = await User.findOne({ _id: userId })
+      const cart = await CartItem.find({ user: userId })
+      for await (let cartItem of cart) {
+        cartItem.populate('pokemon').execPopulate()
+      }
+      console.log(JSON.stringify(cart, undefined, 2))
       if (!me) {
         throw new Error('No user found')
       }
       await me.populate('offers').execPopulate()
       await me.populate('wallet').execPopulate()
-      // console.log(me.offers)
+      // await me.populate('cart').execPopulate()
+      // await me.cart.populate('pokemon').execPopulate()
+      // console.log(me.cart)
       return {
         id: me._id,
         name: me.name,
         email: me.email,
         offers: me.offers,
         wallet: me.wallet[0],
+        cart,
       }
     },
     async user(parent, args, ctx, info) {
-      const user = await User.findOne({ _id: args.userId })
+      const user = await User.findById(args.userId)
       await user.populate('offers').execPopulate()
       await user.populate('wallet').execPopulate()
       // console.log(user.offers)
