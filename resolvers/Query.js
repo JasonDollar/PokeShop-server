@@ -16,11 +16,8 @@ module.exports = {
     async me(parent, args, ctx, info) {
       const { userId } = ctx.request.request
       const me = await User.findOne({ _id: userId })
-      const cart = await CartItem.find({ user: userId })
-      for await (let cartItem of cart) {
-        cartItem.populate('pokemon').execPopulate()
-      }
-      console.log(JSON.stringify(cart, undefined, 2))
+      const cart = await CartItem.find({ user: userId }).populate('pokemon')
+
       if (!me) {
         throw new Error('No user found')
       }
@@ -142,6 +139,14 @@ module.exports = {
       } 
       await wallet.populate('owner').execPopulate()
       return wallet
+    },
+    async userCart(parent, args, ctx, info) {
+      const { userId } = ctx.request.request
+      console.log(userId)
+      const cart = await CartItem.find({ user: userId }).populate('pokemon')
+
+      console.log(JSON.stringify(cart, null, 2))
+      return cart
     },
   },
 }

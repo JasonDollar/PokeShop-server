@@ -7,6 +7,7 @@ type Query {
   pokemonOffers: [PokemonOffer!]
   pokemonOffer(id: ID!): PokemonOffer
   userCredits: Wallet
+  userCart: [CartItem!]
 }
 
 type Mutation {
