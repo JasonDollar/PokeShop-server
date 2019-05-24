@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs')
+const mongoose = require('mongoose')
 const pokemon = require('pokemon')
 const User = require('../models/User')
 const Wallet = require('../models/Wallet')
@@ -53,7 +54,8 @@ module.exports = {
         ...args.data,
         seller: userId,
         pokemon: {
-          id: pokemonRes.id,
+          id: new mongoose.Types.ObjectId(),
+          pokeId: pokemonRes.id,
           name: pokemonRes.name,
           url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
           image: pokemonRes.sprites.front_default,

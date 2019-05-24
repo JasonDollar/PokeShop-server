@@ -4,12 +4,14 @@
   "main": "index.js",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.4",
     "dotenv": "^8.0.0",
     "graphql-yoga": "^1.17.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.5.7",
     "pokedex-promise-v2": "^3.1.1",
-    "pokemon": "^2.0.0"
+    "pokemon": "^2.0.0",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "nodemon": "^1.19.0"

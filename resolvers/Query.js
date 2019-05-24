@@ -1,7 +1,12 @@
+const uuid = require('uuid/v4')
 const P = require('../utils/pokedex')
 const User = require('../models/User')
+const Wallet = require('../models/Wallet')
 const PokemonOffer = require('../models/PokemonOffer')
 const getUserId = require('../utils/getUserId')
+const {
+  Schema, model, ObjectId, Types, 
+} = require('mongoose')
 
 
 
@@ -10,21 +15,24 @@ module.exports = {
     async me(parent, args, ctx, info) {
       const { userId } = ctx.request.request
       const me = await User.findOne({ _id: userId })
-      await me.populate('offers').execPopulate()
-      // console.log(me.offers)
       if (!me) {
         throw new Error('No user found')
       }
+      await me.populate('offers').execPopulate()
+      await me.populate('wallet').execPopulate()
+      // console.log(me.offers)
       return {
         id: me._id,
         name: me.name,
         email: me.email,
         offers: me.offers,
+        wallet: me.wallet[0],
       }
     },
     async user(parent, args, ctx, info) {
       const user = await User.findOne({ _id: args.userId })
       await user.populate('offers').execPopulate()
+      await user.populate('wallet').execPopulate()
       // console.log(user.offers)
       if (!user) {
         throw new Error('No user found')
@@ -34,6 +42,7 @@ module.exports = {
         name: user.name,
         email: user.email,
         offers: user.offers,
+        wallet: user.wallet,
       }
     },
     async pokemons(parent, { skip = 0 }, ctx, info) {
@@ -44,7 +53,8 @@ module.exports = {
         const pokemonId = item.url.replace('https://pokeapi.co/api/v2/pokemon/', '').replace('/', '')
         const image = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`
         pokeList.push({
-          id: pokemonId,
+          id: uuid(),
+          pokeId: pokemonId,
           name: item.name,
           image,
           url: item.url,
@@ -64,11 +74,12 @@ module.exports = {
       pokemonRes.types.map(item => {
         pokeType.push({
           ...item.type,
-          id: item.type.url.replace('https://pokeapi.co/api/v2/type/', '').replace('/', ''),
+          pokeId: item.type.url.replace('https://pokeapi.co/api/v2/type/', '').replace('/', ''),
         })
       })
       return {
-        id: pokemonRes.id,
+        id: uuid(),
+        pokeId: pokemonRes.id,
         name: pokemonRes.name,
         url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
         image: pokemonRes.sprites.front_default,
@@ -104,6 +115,7 @@ module.exports = {
     },
     async pokemonOffers(parent, args, ctx, info) {
       const pokemonOffers = await PokemonOffer.find()
+
       return pokemonOffers
     },
     async pokemonOffer(parent, args, ctx, info) {
@@ -111,6 +123,16 @@ module.exports = {
       await pokemonOffer.populate('seller').execPopulate()
       pokemonOffer.id = pokemonOffer._id
       return pokemonOffer
+    },
+    async userCredits(parent, args, ctx, info) {
+      const id = getUserId(ctx)
+      // console.log(ctx.request.request.userId)
+      const wallet = await Wallet.findOne({ owner: id })
+      if (!wallet) {
+        return null
+      } 
+      await wallet.populate('owner').execPopulate()
+      return wallet
     },
   },
 }

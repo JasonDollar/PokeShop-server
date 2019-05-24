@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose')
 
-const userSchema = new Schema({
+const walletSchema = new Schema({
   balance: {
     type: Number,
     required: true,
@@ -13,12 +13,12 @@ const userSchema = new Schema({
   },
 })
 
-// userSchema.virtual('offers', {
-//   ref: 'PokemonOffer',
-//   localField: '_id',
-//   foreignField: 'seller',
+// walletSchema.virtual('owner', {
+//   ref: 'user',
+//   localField: 'owner',
+//   foreignField: '_id',
 // })
 
-const Wallet = model('wallet', userSchema)
+const Wallet = model('wallet', walletSchema)
 
 module.exports = Wallet
