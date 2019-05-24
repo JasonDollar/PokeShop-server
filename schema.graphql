@@ -13,6 +13,7 @@ type Mutation {
   createUser(data: CreateUserInput!): AuthPayload!
   login(data: LoginInput!): AuthPayload!
   sellPokemon(data: SellPokemonInput!): PokemonOffer!
+  addToCart(id: ID!): CartItem!
 }
 
 type User {
@@ -21,6 +22,7 @@ type User {
   email: String!
   offers: [PokemonOffer!]
   wallet: Wallet
+  cart: [CartItem!]
 }
 
 input CreateUserInput {
@@ -81,4 +83,11 @@ type Wallet {
   id: ID!
   balance: Int!
   owner: User
+}
+
+type CartItem {
+  id: ID!
+  quantity: Int!
+  pokemon: PokemonOffer
+  user: User!
 }

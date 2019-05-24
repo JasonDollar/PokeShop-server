@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const pokemon = require('pokemon')
 const User = require('../models/User')
 const Wallet = require('../models/Wallet')
+const CartItem = require('../models/CartItem')
 const PokemonOffer = require('../models/PokemonOffer')
 const generateToken = require('../utils/generateToken')
 const getUserId = require('../utils/getUserId')
@@ -64,6 +65,31 @@ module.exports = {
       const saved = await pokemonOffer.save()
       await saved.populate('seller').execPopulate()
       return saved
+    },
+    async addToCart(parent, args, ctx, info) {
+      const { id: pokemonOfferId } = args
+      const userId = getUserId(ctx)
+      if (!userId) {
+        throw new Error('You must be logged in')
+      }
+      const pokemonOffer = await PokemonOffer.findById(pokemonOfferId)
+      if (!pokemonOffer) throw new Error('No such is available for sale')
+      const cartItem = await CartItem.findOne({ pokemon: pokemonOfferId })
+      if (cartItem) {
+        cartItem.quantity += 1
+        const savedCartItem = await cartItem.save()
+        await savedCartItem.populate('pokemon').execPopulate()
+        await savedCartItem.populate('user').execPopulate()
+        return cartItem
+      }
+      const newCartItem = new CartItem({
+        user: userId,
+        pokemon: pokemonOfferId,
+      })
+      const savedNewCartItem = await newCartItem.save()
+      await savedNewCartItem.populate('pokemon').execPopulate()
+      await savedNewCartItem.populate('user').execPopulate()
+      return savedNewCartItem
     },
   },
 }
