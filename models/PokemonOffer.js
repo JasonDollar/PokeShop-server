@@ -18,12 +18,8 @@ const pokemonSchema = new Schema({
     required: true,
   },
   pokemon: {
+
     id: {
-      type: String,
-      required: true,
-      default: new Types.ObjectId(),
-    },
-    pokeId: {
       type: Number,
       required: true,
     },

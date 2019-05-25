@@ -59,8 +59,8 @@ module.exports = {
         const pokemonId = item.url.replace('https://pokeapi.co/api/v2/pokemon/', '').replace('/', '')
         const image = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`
         pokeList.push({
-          id: uuid(),
-          pokeId: pokemonId,
+          // id: uuid(),
+          id: pokemonId,
           name: item.name,
           image,
           url: item.url,
@@ -84,8 +84,8 @@ module.exports = {
         })
       })
       return {
-        id: uuid(),
-        pokeId: pokemonRes.id,
+        // id: uuid(),
+        id: pokemonRes.id,
         name: pokemonRes.name,
         url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
         image: pokemonRes.sprites.front_default,

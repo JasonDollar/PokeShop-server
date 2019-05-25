@@ -5,6 +5,7 @@ const User = require('../models/User')
 const Wallet = require('../models/Wallet')
 const CartItem = require('../models/CartItem')
 const PokemonOffer = require('../models/PokemonOffer')
+const OrderItem = require('../models/OrderItem')
 const generateToken = require('../utils/generateToken')
 const getUserId = require('../utils/getUserId')
 
@@ -55,8 +56,7 @@ module.exports = {
         ...args.data,
         seller: userId,
         pokemon: {
-          id: new mongoose.Types.ObjectId(),
-          pokeId: pokemonRes.id,
+          id: pokemonRes.id,
           name: pokemonRes.name,
           url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
           image: pokemonRes.sprites.front_default,
@@ -72,9 +72,9 @@ module.exports = {
       if (!userId) {
         throw new Error('You must be logged in')
       }
-      const pokemonOffer = await PokemonOffer.findById(pokemonOfferId)
-      if (!pokemonOffer) throw new Error('No such is available for sale')
-      const cartItem = await CartItem.findOne({ pokemon: pokemonOfferId })
+      const pokemonOffer = await PokemonOffer.findOne({_id: pokemonOfferId})
+      if (!pokemonOffer) throw new Error('No such item is available for sale')
+      const cartItem = await CartItem.findOne({ pokemon: pokemonOfferId, user: userId })
       if (cartItem) {
         cartItem.quantity += 1
         const savedCartItem = await cartItem.save()
@@ -100,5 +100,35 @@ module.exports = {
       const cartItem = await CartItem.findByIdAndDelete(cartItemId)
       return cartItem
     },
+    async orderPokemons(parent, args, ctx, info) {
+      const userId = getUserId(ctx)
+      if (!userId) {
+        throw new Error('You must be logged in')
+      }
+      const cart = await CartItem.find({ user: userId }).populate('pokemon')
+      // console.log(cart[0].pokemon);
+      const orderItems = []
+      cart.forEach(item => {
+        // const newOrderItem = new OrderItem(item)
+        // console.log({...item.pokemon});
+        
+        orderItems.push(new OrderItem({
+          ...item,
+          pokemon: {
+            ...item.pokemon._doc,
+            id: item.pokemon.id,
+            pokemon: {
+              ...item.pokemon.pokemon._doc,
+              id: item.pokemon.pokemon.id
+            }
+          }
+        }))
+      })
+      // const orderItem = new OrderItem(cart[0])
+      console.log(orderItems[0].pokemon);
+      // for await (let item of orderItems) {
+      //   await item.save()
+      // }
+    }
   },
 }

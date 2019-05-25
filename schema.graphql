@@ -16,6 +16,7 @@ type Mutation {
   sellPokemon(data: SellPokemonInput!): PokemonOffer!
   addToCart(id: ID!): CartItem!
   removeFromCart(id: ID!): CartItem!
+  orderPokemons: Order
 }
 
 type User {
@@ -45,7 +46,7 @@ input LoginInput {
 
 type Pokemon {
   id: ID!
-  pokeId: Int!
+  # pokeId: Int!
   name: String!
   url: String!
   image: String!
@@ -53,7 +54,7 @@ type Pokemon {
 
 type PokemonDetail {
   id: ID!
-  pokeId: Int!
+  # pokeId: Int!
   name: String!
   url: String!
   image: String!
@@ -92,4 +93,17 @@ type CartItem {
   quantity: Int!
   pokemon: PokemonOffer
   user: User!
+}
+
+type OrderItem {
+  id: ID!
+  quantity: Int!
+  pokemon: PokemonOffer
+  user: User!
+}
+
+type Order {
+  id: ID!
+  price: Int!
+  items: [OrderItem!]
 }
