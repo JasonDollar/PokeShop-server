@@ -3,6 +3,7 @@ const P = require('../utils/pokedex')
 const User = require('../models/User')
 const Wallet = require('../models/Wallet')
 const CartItem = require('../models/CartItem')
+const Order = require('../models/Order')
 const PokemonOffer = require('../models/PokemonOffer')
 const getUserId = require('../utils/getUserId')
 const {
@@ -147,6 +148,12 @@ module.exports = {
 
       // console.log(JSON.stringify(cart, null, 2))
       return cart
+    },
+    async orders(parent, args, ctx, info) {
+      const userId = getUserId(ctx)
+      const orders = await Order.find({ user: userId }).populate(['items', 'user', 'items.seller'])
+      console.log(orders[0])
+      return orders
     },
   },
 }
