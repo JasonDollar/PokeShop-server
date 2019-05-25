@@ -9,6 +9,8 @@ const OrderItem = require('../models/OrderItem')
 const Order = require('../models/Order')
 const generateToken = require('../utils/generateToken')
 const getUserId = require('../utils/getUserId')
+const sendMoney = require('../utils/sendMoney')
+const saveManyItemsToDb = require('../utils/saveManyItemsToDb')
 
 const P = require('../utils/pokedex')
 
@@ -138,15 +140,7 @@ module.exports = {
         orderItems.push(new OrderItem(newOrderItem))
       })
 
-      const savedOrders = []
-      async function iterateOrderItemsToSaveToDb(orderItemsArray) {
-        for (let item of orderItemsArray) {
-          const savedOrder = await item.save()
-          savedOrders.push(savedOrder)
-        }
-
-      }
-      await iterateOrderItemsToSaveToDb(orderItems)
+      const savedOrders = await saveManyItemsToDb(orderItems)
 
       const order = new Order({
         price: savedOrders.reduce((acc, item) => acc + item.price, 0),
@@ -154,9 +148,16 @@ module.exports = {
         items: savedOrders.map(item => item.id),
       })
       const orderSavedInDB = await order.save()
+
+      await sendMoney(savedOrders.map(item => ({
+        user: item.seller,
+        payment: item.price,
+      })))
+
+      userWallet.balance -= orderSavedInDB.price
+      await userWallet.save()
       await orderSavedInDB.populate(['user', 'items']).execPopulate()
       await CartItem.deleteMany({ _id: { $in: cartItemsIds } })
-      // console.log(orderSavedInDB)
       return orderSavedInDB
     },
   },
