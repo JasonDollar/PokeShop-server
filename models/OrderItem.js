@@ -6,46 +6,37 @@ const orderItemSchema = new Schema({
     default: 1,
     required: true,
   },
+  price: {
+    type: Number,
+    required: true,
+  },
   user: {
     type: Schema.Types.ObjectId,
     ref: 'user',
     required: true,
   },
+  seller: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  },
   pokemon: {
+    //pokemon details from pokedex
     id: {
-      type: Types.ObjectId
+      type: Number,
+      required: true,
     },
     name: {
       type: String,
       required: true,
     },
-    price: {
-      type: Number,
+    url: {
+      type: String,
       required: true,
     },
-    seller: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
+    image: {
+      type: String,
       required: true,
-    },
-    pokemon: {
-
-      id: {
-        type: Number,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      url: {
-        type: String,
-        required: true,
-      },
-      image: {
-        type: String,
-        required: true,
-      },
     },
   },
 

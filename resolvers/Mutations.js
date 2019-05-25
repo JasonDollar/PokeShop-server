@@ -6,6 +6,7 @@ const Wallet = require('../models/Wallet')
 const CartItem = require('../models/CartItem')
 const PokemonOffer = require('../models/PokemonOffer')
 const OrderItem = require('../models/OrderItem')
+const Order = require('../models/Order')
 const generateToken = require('../utils/generateToken')
 const getUserId = require('../utils/getUserId')
 
@@ -72,8 +73,9 @@ module.exports = {
       if (!userId) {
         throw new Error('You must be logged in')
       }
-      const pokemonOffer = await PokemonOffer.findOne({_id: pokemonOfferId})
+      const pokemonOffer = await PokemonOffer.findById(pokemonOfferId)
       if (!pokemonOffer) throw new Error('No such item is available for sale')
+
       const cartItem = await CartItem.findOne({ pokemon: pokemonOfferId, user: userId })
       if (cartItem) {
         cartItem.quantity += 1
@@ -105,30 +107,57 @@ module.exports = {
       if (!userId) {
         throw new Error('You must be logged in')
       }
+      
+      
       const cart = await CartItem.find({ user: userId }).populate('pokemon')
-      // console.log(cart[0].pokemon);
+      // console.log(JSON.stringify(cart[0], undefined, 2))
+      if (cart.length <= 0) throw new Error('You don\'t have anything in your cart')
+      const user = await User.findById(userId)
+      const userWallet = await Wallet.findOne({ owner: userId })
+      const doesUserHaveEnoughMoney = cart.reduce((acc, item) => acc + (item.pokemon.price * item.quantity), 0) <= userWallet.balance
+      if (!doesUserHaveEnoughMoney) {
+        throw new Error('You don\'t have enough credits to purchase that')
+      }
+      
+      
+      const cartItemsIds = cart.map(item => item.id)
+      const pokemonOffersIds = cart.map(item => item.pokemon.id)
+      // console.log(pokemonOffersIds)
+      
       const orderItems = []
       cart.forEach(item => {
         // const newOrderItem = new OrderItem(item)
         // console.log({...item.pokemon});
-        
-        orderItems.push(new OrderItem({
-          ...item,
-          pokemon: {
-            ...item.pokemon._doc,
-            id: item.pokemon.id,
-            pokemon: {
-              ...item.pokemon.pokemon._doc,
-              id: item.pokemon.pokemon.id
-            }
-          }
-        }))
+        const newOrderItem = {
+          quantity: item.quantity,
+          price: item.pokemon.price * item.quantity,
+          seller: item.pokemon.seller,
+          user: item.user,
+          pokemon: item.pokemon.pokemon,
+        }
+        orderItems.push(new OrderItem(newOrderItem))
       })
-      // const orderItem = new OrderItem(cart[0])
-      console.log(orderItems[0].pokemon);
-      // for await (let item of orderItems) {
-      //   await item.save()
-      // }
-    }
+
+      const savedOrders = []
+      async function iterateOrderItemsToSaveToDb(orderItemsArray) {
+        for (let item of orderItemsArray) {
+          const savedOrder = await item.save()
+          savedOrders.push(savedOrder)
+        }
+
+      }
+      await iterateOrderItemsToSaveToDb(orderItems)
+
+      const order = new Order({
+        price: savedOrders.reduce((acc, item) => acc + item.price, 0),
+        user: userId,
+        items: savedOrders.map(item => item.id),
+      })
+      const orderSavedInDB = await order.save()
+      await orderSavedInDB.populate(['user', 'items']).execPopulate()
+      await CartItem.deleteMany({ _id: { $in: cartItemsIds } })
+      // console.log(orderSavedInDB)
+      return orderSavedInDB
+    },
   },
 }

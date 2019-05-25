@@ -98,12 +98,15 @@ type CartItem {
 type OrderItem {
   id: ID!
   quantity: Int!
-  pokemon: PokemonOffer
+  price: Int!
+  pokemon: Pokemon!
   user: User!
+  seller: User!
 }
 
 type Order {
   id: ID!
   price: Int!
+  user: User!
   items: [OrderItem!]
 }
