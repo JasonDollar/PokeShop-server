@@ -29,13 +29,18 @@ module.exports = {
       await wallet.save()
       const token = generateToken(newUser._id, email)
       return {
-        user: newUser,
+        user: {
+          id,
+          name: newUser.name,
+          email: newUser.email,
+        },
         token,
       }
     },
     async login(parent, args, ctx, info) {
       const { email, password } = args.data
       const user = await User.findOne({ email })
+      user.toJSON()
       if (!user) {
         throw new Error('Unable to login')
       }
@@ -44,8 +49,13 @@ module.exports = {
         throw new Error('Unable to login')
       }
       const token = generateToken(user._id, email)
+      // console.log(user)
       return {
-        user,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
         token,
       }
     },
@@ -82,8 +92,8 @@ module.exports = {
       if (cartItem) {
         cartItem.quantity += 1
         const savedCartItem = await cartItem.save()
-        await savedCartItem.populate('pokemon').execPopulate()
-        await savedCartItem.populate('user').execPopulate()
+        await savedCartItem.populate(['pokemon', 'pokemon.pokemon', 'user']).execPopulate()
+
         return cartItem
       }
       const newCartItem = new CartItem({
@@ -91,8 +101,8 @@ module.exports = {
         pokemon: pokemonOfferId,
       })
       const savedNewCartItem = await newCartItem.save()
-      await savedNewCartItem.populate('pokemon').execPopulate()
-      await savedNewCartItem.populate('user').execPopulate()
+      await savedNewCartItem.populate(['pokemon', 'pokemon.pokemon', 'user']).execPopulate()
+
       return savedNewCartItem
     },
     async removeFromCart(parent, args, ctx, info) {
@@ -105,31 +115,26 @@ module.exports = {
       return cartItem
     },
     async orderPokemons(parent, args, ctx, info) {
+      
       const userId = getUserId(ctx)
       if (!userId) {
         throw new Error('You must be logged in')
       }
       
-      
       const cart = await CartItem.find({ user: userId }).populate('pokemon')
-      // console.log(JSON.stringify(cart[0], undefined, 2))
       if (cart.length <= 0) throw new Error('You don\'t have anything in your cart')
-      const user = await User.findById(userId)
-      const userWallet = await Wallet.findOne({ owner: userId })
-      const doesUserHaveEnoughMoney = cart.reduce((acc, item) => acc + (item.pokemon.price * item.quantity), 0) <= userWallet.balance
-      if (!doesUserHaveEnoughMoney) {
-        throw new Error('You don\'t have enough credits to purchase that')
+      const cartPriceTotal = cart.reduce((acc, item) => acc + (item.pokemon.price * item.quantity), 0)
+      const userWallet = await Wallet.findOne({ $and: [{ owner: userId }, { balance: { $gte: cartPriceTotal } }] })
+      // const doesUserHaveEnoughMoney =  <= userWallet.balance
+      // console.log(userWallet)
+      if (!userWallet) {
+        throw new Error('You don\'t have enough credits to make a purchase')
       }
       
-      
       const cartItemsIds = cart.map(item => item.id)
-      const pokemonOffersIds = cart.map(item => item.pokemon.id)
-      // console.log(pokemonOffersIds)
-      
+
       const orderItems = []
       cart.forEach(item => {
-        // const newOrderItem = new OrderItem(item)
-        // console.log({...item.pokemon});
         const newOrderItem = {
           quantity: item.quantity,
           price: item.pokemon.price * item.quantity,
@@ -156,8 +161,10 @@ module.exports = {
 
       userWallet.balance -= orderSavedInDB.price
       await userWallet.save()
+      
       await orderSavedInDB.populate(['user', 'items']).execPopulate()
       await CartItem.deleteMany({ _id: { $in: cartItemsIds } })
+
       return orderSavedInDB
     },
   },

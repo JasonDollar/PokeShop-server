@@ -17,16 +17,13 @@ module.exports = {
     async me(parent, args, ctx, info) {
       const { userId } = ctx.request.request
       const me = await User.findOne({ _id: userId })
-      const cart = await CartItem.find({ user: userId }).populate('pokemon')
-
+      
       if (!me) {
         throw new Error('No user found')
       }
-      await me.populate('offers').execPopulate()
-      await me.populate('wallet').execPopulate()
-      // await me.populate('cart').execPopulate()
-      // await me.cart.populate('pokemon').execPopulate()
-      // console.log(me.cart)
+      const cart = await CartItem.find({ user: userId }).populate('pokemon')
+      await me.populate(['offers', 'wallet']).execPopulate()
+
       return {
         id: me._id,
         name: me.name,
@@ -38,9 +35,9 @@ module.exports = {
     },
     async user(parent, args, ctx, info) {
       const user = await User.findById(args.userId)
-      await user.populate('offers').execPopulate()
-      await user.populate('wallet').execPopulate()
-      // console.log(user.offers)
+      await user.populate(['offers', 'wallet']).execPopulate()
+      // await user.populate('wallet').execPopulate()
+      console.log(user.wallet)
       if (!user) {
         throw new Error('No user found')
       }
@@ -49,7 +46,7 @@ module.exports = {
         name: user.name,
         email: user.email,
         offers: user.offers,
-        wallet: user.wallet,
+        wallet: user.wallet[0],
       }
     },
     async pokemons(parent, { skip = 0 }, ctx, info) {
@@ -126,33 +123,28 @@ module.exports = {
       return pokemonOffers
     },
     async pokemonOffer(parent, args, ctx, info) {
-      const pokemonOffer = await PokemonOffer.findOne({ _id: args.id })
-      await pokemonOffer.populate('seller').execPopulate()
+      const pokemonOffer = await PokemonOffer.findOne({ _id: args.id }).populate('seller')
       pokemonOffer.id = pokemonOffer._id
       return pokemonOffer
     },
     async userCredits(parent, args, ctx, info) {
       const id = getUserId(ctx)
       // console.log(ctx.request.request.userId)
-      const wallet = await Wallet.findOne({ owner: id })
+      const wallet = await Wallet.findOne({ owner: id }).populate('owner')
       if (!wallet) {
         return null
       } 
-      await wallet.populate('owner').execPopulate()
       return wallet
     },
     async userCart(parent, args, ctx, info) {
       const { userId } = ctx.request.request
-      // console.log(userId)
       const cart = await CartItem.find({ user: userId }).populate('pokemon')
 
-      // console.log(JSON.stringify(cart, null, 2))
       return cart
     },
     async orders(parent, args, ctx, info) {
       const userId = getUserId(ctx)
       const orders = await Order.find({ user: userId }).populate(['items', 'user', 'items.seller'])
-      console.log(orders[0])
       return orders
     },
   },

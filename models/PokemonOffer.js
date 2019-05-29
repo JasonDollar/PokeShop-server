@@ -1,7 +1,6 @@
 const {
- Schema, model, ObjectId, Types 
+  Schema, model, ObjectId, Types, 
 } = require('mongoose')
-const uuid = require('uuid/v4')
 
 const pokemonSchema = new Schema({
   name: {
