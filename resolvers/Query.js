@@ -16,7 +16,7 @@ module.exports = {
   Query: {
     async me(parent, args, ctx, info) {
       const { userId } = ctx.request.request
-      const me = await User.findOne({ _id: userId })
+      const me = await User.findOne({ _id: userId }).select('id name email')
       
       if (!me) {
         throw new Error('No user found')
@@ -34,10 +34,9 @@ module.exports = {
       }
     },
     async user(parent, args, ctx, info) {
-      const user = await User.findById(args.userId)
+      const user = await User.findById(args.userId).select('id name email')
       await user.populate(['offers', 'wallet']).execPopulate()
-      // await user.populate('wallet').execPopulate()
-      console.log(user.wallet)
+      
       if (!user) {
         throw new Error('No user found')
       }
@@ -74,19 +73,20 @@ module.exports = {
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.id}`)
       // TODO maybe implement edges
       const pokeType = []
-      // console.log(pokemonRes.sprites.front_default)
       pokemonRes.types.map(item => {
         pokeType.push({
           ...item.type,
-          pokeId: item.type.url.replace('https://pokeapi.co/api/v2/type/', '').replace('/', ''),
+          typeId: item.type.url.replace('https://pokeapi.co/api/v2/type/', '').replace('/', ''),
+          id: item.type.name,
         })
       })
+
       return {
         // id: uuid(),
         id: pokemonRes.id,
         name: pokemonRes.name,
         url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
-        image: pokemonRes.sprites.front_default,
+        image: pokemonRes.sprites.front_default || '',
         pokeType,
       }
     },
@@ -123,14 +123,14 @@ module.exports = {
       return pokemonOffers
     },
     async pokemonOffer(parent, args, ctx, info) {
-      const pokemonOffer = await PokemonOffer.findOne({ _id: args.id }).populate('seller')
+      const pokemonOffer = await PokemonOffer.findOne({ _id: args.id }).populate('seller', 'id name email')
       pokemonOffer.id = pokemonOffer._id
       return pokemonOffer
     },
     async userCredits(parent, args, ctx, info) {
       const id = getUserId(ctx)
       // console.log(ctx.request.request.userId)
-      const wallet = await Wallet.findOne({ owner: id }).populate('owner')
+      const wallet = await Wallet.findOne({ owner: id }).populate('owner', 'id name email')
       if (!wallet) {
         return null
       } 
@@ -144,7 +144,7 @@ module.exports = {
     },
     async orders(parent, args, ctx, info) {
       const userId = getUserId(ctx)
-      const orders = await Order.find({ user: userId }).populate(['items', 'user', 'items.seller'])
+      const orders = await Order.find({ user: userId }).populate(['items', 'items.seller']).populate({ path: 'user', select: 'id name email' })
       return orders
     },
   },

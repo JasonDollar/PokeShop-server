@@ -50,7 +50,7 @@ type Pokemon {
   # pokeId: Int!
   name: String!
   url: String!
-  image: String!
+  image: String
 }
 
 type PokemonDetail {
@@ -58,13 +58,13 @@ type PokemonDetail {
   # pokeId: Int!
   name: String!
   url: String!
-  image: String!
+  image: String
   pokeType: [PokeType!]!
 }
 
 type PokeType {
   id: ID!
-  pokeId: Int!
+  typeId: Int!
   name: String!
   url: String!
   pokemon: [Pokemon!]!
@@ -102,7 +102,7 @@ type OrderItem {
   price: Int!
   pokemon: Pokemon!
   user: User!
-  seller: User!
+  seller: User
 }
 
 type Order {

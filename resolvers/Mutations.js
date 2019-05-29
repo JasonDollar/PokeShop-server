@@ -10,7 +10,6 @@ const Order = require('../models/Order')
 const generateToken = require('../utils/generateToken')
 const getUserId = require('../utils/getUserId')
 const sendMoney = require('../utils/sendMoney')
-const saveManyItemsToDb = require('../utils/saveManyItemsToDb')
 
 const P = require('../utils/pokedex')
 
@@ -40,7 +39,7 @@ module.exports = {
     async login(parent, args, ctx, info) {
       const { email, password } = args.data
       const user = await User.findOne({ email })
-      user.toJSON()
+      // user.toJSON()
       if (!user) {
         throw new Error('Unable to login')
       }
@@ -76,7 +75,7 @@ module.exports = {
         },
       })
       const saved = await pokemonOffer.save()
-      await saved.populate('seller').execPopulate()
+      await saved.populate('seller', 'id name email').execPopulate()
       return saved
     },
     async addToCart(parent, args, ctx, info) {
@@ -92,8 +91,8 @@ module.exports = {
       if (cartItem) {
         cartItem.quantity += 1
         const savedCartItem = await cartItem.save()
-        await savedCartItem.populate(['pokemon', 'pokemon.pokemon', 'user']).execPopulate()
-
+        await savedCartItem.populate(['pokemon', 'pokemon.pokemon']).populate({ path: 'user', select: 'id name email' }).execPopulate()
+        // console.log(savedCartItem.user)
         return cartItem
       }
       const newCartItem = new CartItem({
@@ -101,7 +100,7 @@ module.exports = {
         pokemon: pokemonOfferId,
       })
       const savedNewCartItem = await newCartItem.save()
-      await savedNewCartItem.populate(['pokemon', 'pokemon.pokemon', 'user']).execPopulate()
+      await savedNewCartItem.populate(['pokemon', 'pokemon.pokemon']).populate({ path: 'user', select: 'id name email' }).execPopulate()
 
       return savedNewCartItem
     },
@@ -125,8 +124,7 @@ module.exports = {
       if (cart.length <= 0) throw new Error('You don\'t have anything in your cart')
       const cartPriceTotal = cart.reduce((acc, item) => acc + (item.pokemon.price * item.quantity), 0)
       const userWallet = await Wallet.findOne({ $and: [{ owner: userId }, { balance: { $gte: cartPriceTotal } }] })
-      // const doesUserHaveEnoughMoney =  <= userWallet.balance
-      // console.log(userWallet)
+
       if (!userWallet) {
         throw new Error('You don\'t have enough credits to make a purchase')
       }
@@ -145,7 +143,7 @@ module.exports = {
         orderItems.push(new OrderItem(newOrderItem))
       })
 
-      const savedOrders = await saveManyItemsToDb(orderItems)
+      const savedOrders = await OrderItem.create(orderItems)
 
       const order = new Order({
         price: savedOrders.reduce((acc, item) => acc + item.price, 0),
@@ -162,7 +160,7 @@ module.exports = {
       userWallet.balance -= orderSavedInDB.price
       await userWallet.save()
       
-      await orderSavedInDB.populate(['user', 'items']).execPopulate()
+      await orderSavedInDB.populate('items').populate({ path: 'user', select: 'id name email' }).execPopulate()
       await CartItem.deleteMany({ _id: { $in: cartItemsIds } })
 
       return orderSavedInDB
