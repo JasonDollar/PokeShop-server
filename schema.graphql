@@ -9,6 +9,7 @@ type Query {
   userCredits: Wallet
   userCart: [CartItem!]
   orders: [Order!]
+  searchPokeName(name: String): [String!]!
 }
 
 type Mutation {

@@ -1,4 +1,5 @@
 const uuid = require('uuid/v4')
+const pokeNames = require('../files/pokemonNames.json')
 const P = require('../utils/pokedex')
 const User = require('../models/User')
 const Wallet = require('../models/Wallet')
@@ -118,7 +119,7 @@ module.exports = {
       return type
     },
     async pokemonOffers(parent, args, ctx, info) {
-      const { skip = 0, limit = 30 } = args
+      const { skip = 0, limit = 24 } = args
       const count = await PokemonOffer.count()
       // console.log(count)
       const pokemonOffers = await PokemonOffer.find().limit(limit).skip(skip)
@@ -153,6 +154,11 @@ module.exports = {
       const userId = getUserId(ctx)
       const orders = await Order.find({ user: userId }).populate(['items', 'items.seller']).populate({ path: 'user', select: 'id name email' })
       return orders
+    },
+    async searchPokeName(parent, args, ctx, info) {
+      
+      const nameList = pokeNames.filter(item => item.toLowerCase().includes(args.name.toLowerCase())).sort().slice(0, 5)
+      return nameList
     },
   },
 }
