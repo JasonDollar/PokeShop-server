@@ -118,9 +118,16 @@ module.exports = {
       return type
     },
     async pokemonOffers(parent, args, ctx, info) {
-      const pokemonOffers = await PokemonOffer.find()
+      const { skip = 0, limit = 30 } = args
+      const count = await PokemonOffer.count()
+      // console.log(count)
+      const pokemonOffers = await PokemonOffer.find().limit(limit).skip(skip)
+      // console.log(pokemonOffers.count())
 
-      return pokemonOffers
+      return {
+        count,
+        offers: pokemonOffers,
+      }
     },
     async pokemonOffer(parent, args, ctx, info) {
       const pokemonOffer = await PokemonOffer.findOne({ _id: args.id }).populate('seller', 'id name email')

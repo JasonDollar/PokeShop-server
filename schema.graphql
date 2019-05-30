@@ -4,7 +4,7 @@ type Query {
   pokemons(skip: Int!): [Pokemon!]!
   pokemon(id: ID!): PokemonDetail
   pokeType(id: ID!): PokeType
-  pokemonOffers: [PokemonOffer!]
+  pokemonOffers(skip: Int, limit: Int): PokemonOffersPayload!
   pokemonOffer(id: ID!): PokemonOffer
   userCredits: Wallet
   userCart: [CartItem!]
@@ -13,7 +13,7 @@ type Query {
 
 type Mutation {
   createUser(data: CreateUserInput!): AuthPayload!
-  login(data: LoginInput!): AuthPayload!
+  login(data: LoginInput!): AuthPayload
   sellPokemon(data: SellPokemonInput!): PokemonOffer!
   addToCart(id: ID!): CartItem!
   removeFromCart(id: ID!): CartItem!
@@ -27,6 +27,11 @@ type User {
   offers: [PokemonOffer!]
   wallet: Wallet
   cart: [CartItem!]
+}
+
+type PokemonOffersPayload {
+  count: Int
+  offers: [PokemonOffer!]
 }
 
 input CreateUserInput {
