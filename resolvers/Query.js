@@ -115,13 +115,16 @@ module.exports = {
       return type
     },
     async pokemonOffers(parent, args, ctx, info) {
-      const { skip = 0, limit = 24 } = args
+      const {
+        skip = 0, limit = 24, minPrice = 0, maxPrice = 999999, 
+      } = args
       const count = await PokemonOffer.count()
-      // console.log(count)
+      // const filter = ['water']
       const pokemonOffers = await PokemonOffer.find({
         $and: [
-          { price: { $gte: 0 } },
-          { price: { $lte: 999999 } },
+          { price: { $gte: minPrice } },
+          { price: { $lte: maxPrice } },
+          // { 'pokemon.pokeType': { $all: filter } },
         ], 
       }).limit(limit).skip(skip)
       // console.log(pokemonOffers.count())
@@ -137,7 +140,7 @@ module.exports = {
       return pokemonOffer
     },
     async userCredits(parent, args, ctx, info) {
-      const id = getUserId(ctx)
+      const id = getUserId(ctx) 
       // console.log(ctx.request.request.userId)
       const wallet = await Wallet.findOne({ owner: id }).populate('owner', 'id name email')
       if (!wallet) {
