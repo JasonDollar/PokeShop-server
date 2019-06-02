@@ -34,6 +34,12 @@ const pokemonSchema = new Schema({
       type: String,
       required: true,
     },
+    pokeType: [
+      {
+        type: String,
+        enum: ['normal', 'fighting', 'flying', 'poison', 'ground', 'rock', 'bug', 'ghost', 'steel', 'fire', 'water', 'grass', 'electric', 'psychic', 'ice', 'dragon', 'dark', 'fairy'],
+      },
+    ],
   },
 })
 

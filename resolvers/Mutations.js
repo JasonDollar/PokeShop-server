@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs')
-const mongoose = require('mongoose')
-const pokemon = require('pokemon')
+// const mongoose = require('mongoose')
+// const pokemon = require('pokemon')
 const User = require('../models/User')
 const Wallet = require('../models/Wallet')
 const CartItem = require('../models/CartItem')
@@ -63,7 +63,11 @@ module.exports = {
       if (!userId) {
         throw new Error('You must be logged in')
       }
+      if (args.data.price <= 0) {
+        throw new Error('You must give a price')
+      }
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.data.name}`)
+      
       const pokemonOffer = new PokemonOffer({
         ...args.data,
         seller: userId,
@@ -72,6 +76,7 @@ module.exports = {
           name: pokemonRes.name,
           url: `https://pokeapi.co/api/v2/pokemon/${pokemonRes.id}/`,
           image: pokemonRes.sprites.front_default,
+          pokeType: pokemonRes.types.map(item => item.type.name),
         },
       })
       const saved = await pokemonOffer.save()
@@ -114,7 +119,6 @@ module.exports = {
       return cartItem
     },
     async orderPokemons(parent, args, ctx, info) {
-      
       const userId = getUserId(ctx)
       if (!userId) {
         throw new Error('You must be logged in')
@@ -162,7 +166,6 @@ module.exports = {
       
       await orderSavedInDB.populate('items').populate({ path: 'user', select: 'id name email' }).execPopulate()
       await CartItem.deleteMany({ _id: { $in: cartItemsIds } })
-
       return orderSavedInDB
     },
   },

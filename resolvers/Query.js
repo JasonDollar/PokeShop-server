@@ -1,5 +1,3 @@
-const uuid = require('uuid/v4')
-const pokeNames = require('../files/pokemonNames.json')
 const P = require('../utils/pokedex')
 const User = require('../models/User')
 const Wallet = require('../models/Wallet')
@@ -7,9 +5,7 @@ const CartItem = require('../models/CartItem')
 const Order = require('../models/Order')
 const PokemonOffer = require('../models/PokemonOffer')
 const getUserId = require('../utils/getUserId')
-const {
-  Schema, model, ObjectId, Types, 
-} = require('mongoose')
+const pokeNames = require('../files/pokemonNames.json')
 
 
 
@@ -122,7 +118,12 @@ module.exports = {
       const { skip = 0, limit = 24 } = args
       const count = await PokemonOffer.count()
       // console.log(count)
-      const pokemonOffers = await PokemonOffer.find().limit(limit).skip(skip)
+      const pokemonOffers = await PokemonOffer.find({
+        $and: [
+          { price: { $gte: 0 } },
+          { price: { $lte: 999999 } },
+        ], 
+      }).limit(limit).skip(skip)
       // console.log(pokemonOffers.count())
 
       return {
@@ -157,6 +158,7 @@ module.exports = {
     },
     async searchPokeName(parent, args, ctx, info) {
       
+      if (args.name === '') return []
       const nameList = pokeNames.filter(item => item.toLowerCase().includes(args.name.toLowerCase())).sort().slice(0, 5)
       return nameList
     },

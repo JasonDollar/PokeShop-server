@@ -57,8 +57,10 @@ type Pokemon {
   name: String!
   url: String!
   image: String
+  pokeType: [String!]
 }
 
+# it seems to be obsolete now
 type PokemonDetail {
   id: ID!
   # pokeId: Int!
