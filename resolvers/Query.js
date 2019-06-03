@@ -116,17 +116,28 @@ module.exports = {
     },
     async pokemonOffers(parent, args, ctx, info) {
       const {
-        skip = 0, limit = 24, minPrice = 0, maxPrice = 999999, 
+        skip = 0, limit = 24, minPrice = 0, maxPrice = 999999, pokemonTypes, 
       } = args
+      // console.log(pokemonTypes)
       const count = await PokemonOffer.count()
-      // const filter = ['water']
-      const pokemonOffers = await PokemonOffer.find({
-        $and: [
-          { price: { $gte: minPrice } },
-          { price: { $lte: maxPrice } },
-          // { 'pokemon.pokeType': { $all: filter } },
-        ], 
-      }).limit(limit).skip(skip)
+      let pokemonOffers
+      if (pokemonTypes.length > 0) {
+
+        pokemonOffers = await PokemonOffer.find({
+          $and: [
+            { price: { $gte: minPrice } },
+            { price: { $lte: maxPrice } },
+            { 'pokemon.pokeType': { $all: pokemonTypes } },
+          ], 
+        }).limit(limit).skip(skip)
+      } else {
+        pokemonOffers = await PokemonOffer.find({
+          $and: [
+            { price: { $gte: minPrice } },
+            { price: { $lte: maxPrice } },
+          ], 
+        }).limit(limit).skip(skip)
+      }
       // console.log(pokemonOffers.count())
 
       return {
@@ -136,6 +147,7 @@ module.exports = {
     },
     async pokemonOffer(parent, args, ctx, info) {
       const pokemonOffer = await PokemonOffer.findOne({ _id: args.id }).populate('seller', 'id name email')
+      console.log(pokemonOffer)
       pokemonOffer.id = pokemonOffer._id
       return pokemonOffer
     },

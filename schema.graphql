@@ -4,7 +4,7 @@ type Query {
   pokemons(skip: Int!): [Pokemon!]!
   pokemon(id: ID!): PokemonDetail
   pokeType(id: ID!): PokeType
-  pokemonOffers(skip: Int, limit: Int, minPrice: Int, maxPrice: Int): PokemonOffersPayload!
+  pokemonOffers(skip: Int, limit: Int, minPrice: Int, maxPrice: Int, pokemonTypes: [String!]): PokemonOffersPayload!
   pokemonOffer(id: ID!): PokemonOffer
   userCredits: Wallet
   userCart: [CartItem!]
