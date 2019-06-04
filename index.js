@@ -23,8 +23,17 @@ server.express.use(cookieParser())
 server.express.use((req, res, next) => {
   const token = req.headers.authorization ? req.headers.authorization.replace('Bearer ', '') : ''
   if (token) {
-    const { userId } = jwt.verify(token, process.env.APP_SECRET)
-    req.userId = userId
+
+    const verifiedToken = jwt.verify(token, process.env.APP_SECRET, (err, decoded) => {
+      if (err) return { error: err.message }
+      return decoded
+    })
+
+    if (verifiedToken.error) {
+      req.userId = null
+      return next()
+    }
+    req.userId = verifiedToken.userId
   }
   next()
 })

@@ -64,9 +64,6 @@ module.exports = {
       // https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20
     },
     async pokemon(parent, args, ctx, info) {
-      const token = getUserId(ctx)
-      // console.log(ctx.request.request.headers.authorization)
-      // console.log(token)
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.id}`)
       // TODO maybe implement edges
       const pokeType = []
@@ -118,10 +115,10 @@ module.exports = {
       const {
         skip = 0, limit = 24, minPrice = 0, maxPrice = 999999, pokemonTypes, 
       } = args
-      // console.log(pokemonTypes)
+      
       const count = await PokemonOffer.count()
       let pokemonOffers
-      if (pokemonTypes.length > 0) {
+      if (pokemonTypes && pokemonTypes.length > 0) {
 
         pokemonOffers = await PokemonOffer.find({
           $and: [
@@ -147,7 +144,6 @@ module.exports = {
     },
     async pokemonOffer(parent, args, ctx, info) {
       const pokemonOffer = await PokemonOffer.findOne({ _id: args.id }).populate('seller', 'id name email')
-      console.log(pokemonOffer)
       pokemonOffer.id = pokemonOffer._id
       return pokemonOffer
     },
