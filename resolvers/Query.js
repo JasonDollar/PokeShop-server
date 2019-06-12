@@ -116,10 +116,17 @@ module.exports = {
         skip = 0, limit = 24, minPrice = 0, maxPrice = 999999, pokemonTypes, 
       } = args
       
-      const count = await PokemonOffer.count()
+      
       let pokemonOffers
+      let count
       if (pokemonTypes && pokemonTypes.length > 0) {
-
+        count = await PokemonOffer.find({
+          $and: [
+            { price: { $gte: minPrice } },
+            { price: { $lte: maxPrice } },
+            { 'pokemon.pokeType': { $all: pokemonTypes } },
+          ], 
+        }).count()
         pokemonOffers = await PokemonOffer.find({
           $and: [
             { price: { $gte: minPrice } },
@@ -128,6 +135,7 @@ module.exports = {
           ], 
         }).limit(limit).skip(skip)
       } else {
+        count = await PokemonOffer.count()
         pokemonOffers = await PokemonOffer.find({
           $and: [
             { price: { $gte: minPrice } },
