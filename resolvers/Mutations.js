@@ -147,9 +147,9 @@ module.exports = {
         orderItems.push(new OrderItem(newOrderItem))
       })
 
-      const savedOrders = await OrderItem.create(orderItems)
+      const savedOrders = await OrderItem.create(orderItems) 
 
-      const order = new Order({
+      const order = new Order({ 
         price: savedOrders.reduce((acc, item) => acc + item.price, 0),
         user: userId,
         items: savedOrders.map(item => item.id),

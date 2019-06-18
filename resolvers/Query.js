@@ -173,6 +173,7 @@ module.exports = {
     async orders(parent, args, ctx, info) {
       const userId = getUserId(ctx)
       const orders = await Order.find({ user: userId }).populate(['items', 'items.seller']).populate({ path: 'user', select: 'id name email' })
+      console.log(orders) 
       return orders
     },
     async searchPokeName(parent, args, ctx, info) {

@@ -17,6 +17,8 @@ const orderSchema = new Schema({
       required: true,
     },
   ],
+}, {
+  timestamps: true,
 })
 
 // orderSchema.virtual('owner', {

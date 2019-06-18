@@ -41,6 +41,8 @@ const pokemonSchema = new Schema({
       },
     ],
   },
+}, {
+  timestamps: true,
 })
 
 const PokemonOffer = model('PokemonOffer', pokemonSchema)

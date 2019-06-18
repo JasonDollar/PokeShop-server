@@ -90,6 +90,7 @@ type PokemonOffer {
   price: Int!
   pokemon: Pokemon!
   seller: User!
+  createdAt: String
 }
 
 type Wallet {
@@ -119,4 +120,5 @@ type Order {
   price: Int!
   user: User!
   items: [OrderItem!]
+  createdAt: String
 }
