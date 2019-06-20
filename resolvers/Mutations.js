@@ -115,8 +115,16 @@ module.exports = {
       if (!userId) {
         throw new Error('You must be logged in')
       }
-      const cartItem = await CartItem.findByIdAndDelete(cartItemId)
-      return cartItem
+      let cartItem = await CartItem.findOne({ _id: cartItemId, user: userId })
+      if (cartItem.quantity >= 2) {
+        cartItem.quantity -= 1
+        const savedCartItem = await cartItem.save()
+        await savedCartItem.populate(['pokemon', 'pokemon.pokemon']).populate({ path: 'user', select: 'id name email' }).execPopulate()
+        // console.log(savedCartItem.user)
+        return cartItem
+      }
+      await CartItem.deleteOne({ _id: cartItemId })
+      return null
     },
     async orderPokemons(parent, args, ctx, info) {
       const userId = getUserId(ctx)

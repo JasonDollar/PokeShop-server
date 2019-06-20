@@ -17,7 +17,7 @@ type Mutation {
   login(data: LoginInput!): AuthPayload
   sellPokemon(data: SellPokemonInput!): PokemonOffer!
   addToCart(id: ID!): CartItem!
-  removeFromCart(id: ID!): CartItem!
+  removeFromCart(id: ID!): CartItem
   orderPokemons: Order
 }
 
