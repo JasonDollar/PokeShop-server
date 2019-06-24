@@ -67,7 +67,6 @@ module.exports = {
         throw new Error('You must give a price')
       }
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.data.name}`)
-      
       const pokemonOffer = new PokemonOffer({
         ...args.data,
         seller: userId,

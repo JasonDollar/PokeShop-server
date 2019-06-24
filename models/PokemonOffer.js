@@ -20,6 +20,9 @@ const pokemonSchema = new Schema({
     type: Boolean,
     default: true,
   },
+  description: {
+    type: String,
+  },
   pokemon: {
 
     id: {
