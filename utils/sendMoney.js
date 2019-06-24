@@ -7,7 +7,6 @@ const sendMoney = async listOfPaymentReceivers => {
         balance: paymentReceiver.payment,
       },
     })
-    console.log(lol)
   }
 }
 

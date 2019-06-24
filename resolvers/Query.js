@@ -122,6 +122,7 @@ module.exports = {
       if (pokemonTypes && pokemonTypes.length > 0) {
         count = await PokemonOffer.find({
           $and: [
+            { available: true },
             { price: { $gte: minPrice } },
             { price: { $lte: maxPrice } },
             { 'pokemon.pokeType': { $all: pokemonTypes } },
@@ -129,15 +130,17 @@ module.exports = {
         }).count()
         pokemonOffers = await PokemonOffer.find({
           $and: [
+            { available: true },
             { price: { $gte: minPrice } },
             { price: { $lte: maxPrice } },
             { 'pokemon.pokeType': { $all: pokemonTypes } },
           ], 
         }).limit(limit).skip(skip)
       } else {
-        count = await PokemonOffer.count()
+        count = await PokemonOffer.find({ available: true }).count()
         pokemonOffers = await PokemonOffer.find({
           $and: [
+            { available: true },
             { price: { $gte: minPrice } },
             { price: { $lte: maxPrice } },
           ], 

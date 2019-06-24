@@ -1,5 +1,5 @@
 const {
-  Schema, model, ObjectId, Types, 
+  Schema, model, 
 } = require('mongoose')
 
 const pokemonSchema = new Schema({
@@ -15,6 +15,10 @@ const pokemonSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'user',
     required: true,
+  },
+  available: {
+    type: Boolean,
+    default: true,
   },
   pokemon: {
 

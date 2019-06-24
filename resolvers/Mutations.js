@@ -89,7 +89,7 @@ module.exports = {
       if (!userId) {
         throw new Error('You must be logged in')
       }
-      const pokemonOffer = await PokemonOffer.findById(pokemonOfferId)
+      const pokemonOffer = await PokemonOffer.findOne({ _id: pokemonOfferId, available: true })
       if (!pokemonOffer) throw new Error('No such item is available for sale')
 
       const cartItem = await CartItem.findOne({ pokemon: pokemonOfferId, user: userId })
