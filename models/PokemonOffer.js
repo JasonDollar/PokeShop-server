@@ -5,11 +5,14 @@ const {
 const pokemonSchema = new Schema({
   name: {
     type: String,
-    required: true,
+    required: [true, 'Please, provide pokemon name you want to sell'],
   },
   price: {
     type: Number,
-    required: true,
+    required: [true, 'Please, provide a price'],
+    validate(val) {
+      return val > 0
+    },
   },
   seller: {
     type: Schema.Types.ObjectId,

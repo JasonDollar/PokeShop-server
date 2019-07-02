@@ -11,7 +11,8 @@
     "mongoose": "^5.6.0",
     "pokedex-promise-v2": "^3.1.1",
     "pokemon": "^2.0.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "validator": "^11.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.19.0"

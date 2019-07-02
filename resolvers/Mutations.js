@@ -63,9 +63,9 @@ module.exports = {
       if (!userId) {
         throw new Error('You must be logged in')
       }
-      if (args.data.price <= 0) {
-        throw new Error('You must give a price')
-      }
+      
+      if (!args.data.name) throw new Error('Please, provide a pokemon name')
+
       const pokemonRes = await P.resource(`/api/v2/pokemon/${args.data.name}`)
       const pokemonOffer = new PokemonOffer({
         ...args.data,
