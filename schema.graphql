@@ -1,7 +1,7 @@
 type Query {
   me: User
   user(userId: ID!): User
-  users(adminId: ID!): [User]!
+  users: [User]!
   pokemons(skip: Int!): [Pokemon!]!
   pokemon(id: ID!): PokemonDetail
   pokeType(id: ID!): PokeType

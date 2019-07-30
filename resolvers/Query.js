@@ -8,11 +8,10 @@ const getUserId = require('../utils/getUserId')
 const pokeNames = require('../files/pokemonNames.json')
 
 
-
 module.exports = {
   Query: {
     async me(parent, args, ctx, info) {
-      const { userId } = ctx.request.request
+      const userId = getUserId(ctx)
       const me = await User.findOne({ _id: userId }).select('id name email role')
 
       if (!me) {
@@ -38,7 +37,7 @@ module.exports = {
       if (!user) {
         throw new Error('No user found')
       }
-      return {
+      return { 
         id: user._id,
         name: user.name,
         email: user.email,
@@ -49,7 +48,8 @@ module.exports = {
     },
     async users(parent, args, ctx, info) {
       try {
-        const isAdmin = await User.findOne({_id: args.adminId, role: 'admin'})
+        const userId = getUserId(ctx)
+        const isAdmin = await User.findOne({_id: userId, role: 'admin'})
         if (!isAdmin) throw new Error('You don\'t have required permission')
         const users = await User.find()
         return users
@@ -172,7 +172,6 @@ module.exports = {
     },
     async userCredits(parent, args, ctx, info) {
       const id = getUserId(ctx) 
-      // console.log(ctx.request.request.userId)
       const wallet = await Wallet.findOne({ owner: id }).populate('owner', 'id name email')
       if (!wallet) {
         return null
@@ -180,7 +179,7 @@ module.exports = {
       return wallet
     },
     async userCart(parent, args, ctx, info) {
-      const { userId } = ctx.request.request
+      const userId = getUserId(ctx) 
       const cart = await CartItem.find({ user: userId }).populate('pokemon')
 
       return cart
