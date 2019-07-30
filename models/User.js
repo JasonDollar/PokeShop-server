@@ -23,6 +23,11 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Please, provide your name'],
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  }
 }, {
   timestamps: true,
 })

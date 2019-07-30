@@ -13,8 +13,8 @@ module.exports = {
   Query: {
     async me(parent, args, ctx, info) {
       const { userId } = ctx.request.request
-      const me = await User.findOne({ _id: userId }).select('id name email')
-      
+      const me = await User.findOne({ _id: userId }).select('id name email role')
+
       if (!me) {
         throw new Error('No user found')
       }
@@ -25,13 +25,14 @@ module.exports = {
         id: me._id,
         name: me.name,
         email: me.email,
+        role: me.role,
         offers: me.offers,
         wallet: me.wallet[0],
         cart,
       }
     },
     async user(parent, args, ctx, info) {
-      const user = await User.findById(args.userId).select('id name email')
+      const user = await User.findById(args.userId).select('id name email role')
       await user.populate(['offers', 'wallet']).execPopulate()
       
       if (!user) {
@@ -41,8 +42,19 @@ module.exports = {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
         offers: user.offers,
         wallet: user.wallet[0],
+      }
+    },
+    async users(parent, args, ctx, info) {
+      try {
+        const isAdmin = await User.findOne({_id: args.adminId, role: 'admin'})
+        if (!isAdmin) throw new Error('You don\'t have required permission')
+        const users = await User.find()
+        return users
+      } catch (e) {
+        throw new Error(e.message)
       }
     },
     async pokemons(parent, { skip = 0 }, ctx, info) {
@@ -59,7 +71,7 @@ module.exports = {
           image,
           url: item.url,
         })
-      })
+      }) 
       return pokeList
       // https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20
     },

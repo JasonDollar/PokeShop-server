@@ -1,6 +1,7 @@
 type Query {
   me: User
   user(userId: ID!): User
+  users(adminId: ID!): [User]!
   pokemons(skip: Int!): [Pokemon!]!
   pokemon(id: ID!): PokemonDetail
   pokeType(id: ID!): PokeType
@@ -25,6 +26,7 @@ type User {
   id: ID!
   name: String!
   email: String!
+  role: String!
   offers: [PokemonOffer!]
   wallet: Wallet
   cart: [CartItem!]
