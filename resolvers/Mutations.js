@@ -178,11 +178,10 @@ module.exports = {
     async adminUpdateUserData(parent, args, ctx, info) {
       try {
         const userId = getUserId(ctx)
-        const isAdmin = await User.count({_id: userId, role: 'admin'})
+        const isAdmin = await User.count({ _id: userId, role: 'admin' })
         if (isAdmin.count <= 0) throw new Error('You don\'t have required permission')
         const updates = { ...args }
-        console.log(updates);
-        
+        updates.userId = undefined
         const updatedUser = await User.findByIdAndUpdate(args.userId, updates, {
           new: true,
           runValidators: true,
@@ -191,6 +190,6 @@ module.exports = {
       } catch (e) {
         throw new Error(e.message)
       }
-    }
+    }, 
   },
 }
