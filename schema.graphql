@@ -20,13 +20,19 @@ type Mutation {
   addToCart(id: ID!): CartItem!
   removeFromCart(id: ID!): CartItem
   orderPokemons: Order
+  adminUpdateUserData(userId: ID!, role: Role, name: String): User
+}
+
+enum Role {
+  admin
+  user
 }
 
 type User {
   id: ID!
   name: String!
   email: String!
-  role: String!
+  role: Role!
   offers: [PokemonOffer!]
   wallet: Wallet
   cart: [CartItem!]

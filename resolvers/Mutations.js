@@ -175,5 +175,22 @@ module.exports = {
       await CartItem.deleteMany({ _id: { $in: cartItemsIds } })
       return orderSavedInDB
     },
+    async adminUpdateUserData(parent, args, ctx, info) {
+      try {
+        const userId = getUserId(ctx)
+        const isAdmin = await User.count({_id: userId, role: 'admin'})
+        if (isAdmin.count <= 0) throw new Error('You don\'t have required permission')
+        const updates = { ...args }
+        console.log(updates);
+        
+        const updatedUser = await User.findByIdAndUpdate(args.userId, updates, {
+          new: true,
+          runValidators: true,
+        })
+        return updatedUser
+      } catch (e) {
+        throw new Error(e.message)
+      }
+    }
   },
 }

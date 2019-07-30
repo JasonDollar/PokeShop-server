@@ -49,8 +49,8 @@ module.exports = {
     async users(parent, args, ctx, info) {
       try {
         const userId = getUserId(ctx)
-        const isAdmin = await User.findOne({_id: userId, role: 'admin'})
-        if (!isAdmin) throw new Error('You don\'t have required permission')
+        const isAdmin = await User.count({_id: userId, role: 'admin'})
+        if (isAdmin.count <= 0) throw new Error('You don\'t have required permission')
         const users = await User.find()
         return users
       } catch (e) {
