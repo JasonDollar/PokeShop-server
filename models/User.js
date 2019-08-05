@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose')
 const validator = require('validator')
+const bcrypt = require('bcryptjs')
 
 const userSchema = new Schema({
   email: {
@@ -27,7 +28,9 @@ const userSchema = new Schema({
     type: String,
     enum: ['user', 'admin'],
     default: 'user',
-  }
+  },
+  resetToken: String,
+  resetTokenExpiry: Date,
 }, {
   timestamps: true,
 })
@@ -50,7 +53,13 @@ userSchema.virtual('cart', {
   foreignField: 'user',
 })
 
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next()
 
+  this.password = await bcrypt.hash(this.password, 12)
+
+  next()
+})
 
 const User = model('user', userSchema)
 

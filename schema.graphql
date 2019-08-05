@@ -21,6 +21,13 @@ type Mutation {
   removeFromCart(id: ID!): CartItem
   orderPokemons: Order
   adminUpdateUserData(userId: ID!, role: Role, name: String, email: String): User
+  createResetToken(email: String!): SuccessMessage
+  resetPassword(resetToken: String!, password: String!, confirmPassword: String!): AuthPayload
+}
+
+type SuccessMessage {
+  message: String!
+  link: String
 }
 
 enum Role {
