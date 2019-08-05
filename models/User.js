@@ -20,7 +20,6 @@ const userSchema = new Schema({
         throw new Error('Your password can\'t be "password"')
       }
     },
-    select: false,
   },
   name: {
     type: String,
