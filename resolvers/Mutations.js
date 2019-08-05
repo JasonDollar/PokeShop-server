@@ -201,7 +201,7 @@ module.exports = {
     user.save()
     // TODO - send an email with reset link, all below is temporary
     const requestUrl = ctx.request.request.headers.origin
-    return { message: `A reset mail sent to ${user.email}`, link: `${requestUrl}/resetPassword?token=${resetToken}` }
+    return { message: `A reset mail sent to ${user.email}`, link: `${requestUrl}/resetPassword?resetToken=${resetToken}` }
   },
   async resetPassword(parent, args, ctx, info) {
     if (args.password !== args.confirmPassword) {

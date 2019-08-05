@@ -6,6 +6,7 @@ const userSchema = new Schema({
   email: {
     type: String,
     unique: true,
+    lowercase: true,
     required: [true, 'Please, provide an email'],
     validate: [validator.isEmail, 'You must provide valid email address'],
   },
@@ -19,6 +20,7 @@ const userSchema = new Schema({
         throw new Error('Your password can\'t be "password"')
       }
     },
+    select: false,
   },
   name: {
     type: String,
