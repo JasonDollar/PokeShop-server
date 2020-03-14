@@ -32,6 +32,11 @@ const userSchema = new Schema({
   },
   resetToken: String,
   resetTokenExpiry: Date,
+  wallet: {
+    type: Schema.Types.ObjectId,
+    ref: 'wallet',
+    required: true,
+  }
 }, {
   timestamps: true,
 })
@@ -42,11 +47,11 @@ userSchema.virtual('offers', {
   foreignField: 'seller',
 })
 
-userSchema.virtual('wallet', {
-  ref: 'wallet',
-  localField: '_id',
-  foreignField: 'owner',
-})
+// userSchema.virtual('wallet', {
+//   ref: 'wallet',
+//   localField: '_id',
+//   foreignField: 'owner',
+// })
 
 userSchema.virtual('cart', {
   ref: 'cartitem',

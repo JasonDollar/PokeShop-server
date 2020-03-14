@@ -22,9 +22,10 @@ module.exports = {
     }
     // const hashedPassword = await bcrypt.hash(password, 10)
     const newUser = new User({ name, email, password })
+    const wallet = new Wallet({ owner: newUser._id })
+    const newWallet = await wallet.save()
+    newUser.wallet = newWallet._id
     const { _id: id } = await newUser.save()
-    const wallet = new Wallet({ owner: id })
-    await wallet.save()
     const token = generateToken(newUser._id, email)
     return {
       user: {
@@ -198,7 +199,7 @@ module.exports = {
     const resetTokenExpiry = Date.now() + 3600000
     user.resetToken = resetToken
     user.resetTokenExpiry = resetTokenExpiry
-    user.save()
+    await user.save()
     // TODO - send an email with reset link, all below is temporary
     const requestUrl = ctx.request.request.headers.origin
     return { message: `A reset mail sent to ${user.email}`, link: `${requestUrl}/resetPassword?resetToken=${resetToken}` }
@@ -230,5 +231,5 @@ module.exports = {
       },
       token,
     }
-  },
+  }
 }

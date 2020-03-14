@@ -12,27 +12,27 @@ module.exports = {
 
   async me(parent, args, ctx, info) {
     const userId = getUserId(ctx)
-    const me = await User.findOne({ _id: userId }).select('id name email role')
+    const me = await User.findOne({ _id: userId }).select('id name email role wallet').populate('wallet')
 
     if (!me) {
       throw new Error('No user found')
     }
     const cart = await CartItem.find({ user: userId }).populate('pokemon')
-    await me.populate(['offers', 'wallet']).execPopulate()
-
+    await me.populate(['offers']).execPopulate()
+    
     return {
       id: me._id,
       name: me.name,
       email: me.email,
       role: me.role,
       offers: me.offers,
-      wallet: me.wallet[0],
+      wallet: me.wallet,
       cart,
     }
   },
   async user(parent, args, ctx, info) {
-    const user = await User.findById(args.userId).select('id name email role')
-    await user.populate(['offers', 'wallet']).execPopulate()
+    const user = await User.findById(args.userId).select('id name email role wallet').populate('wallet')
+    await user.populate(['offers']).execPopulate()
       
     if (!user) {
       throw new Error('No user found')
@@ -43,15 +43,16 @@ module.exports = {
       email: user.email,
       role: user.role,
       offers: user.offers,
-      wallet: user.wallet[0],
+      wallet: user.wallet,
     }
   },
   async users(parent, args, ctx, info) {
     try {
       const userId = getUserId(ctx)
-      const isAdmin = await User.count({ _id: userId, role: 'admin' })
+      const isAdmin = await User.countDocuments({ _id: userId, role: 'admin' })
       if (isAdmin.count <= 0) throw new Error('You don\'t have required permission')
-      const users = await User.find()
+      const users = await User.find().select('-password').populate('wallet')
+      console.log(users[0])
       return users
     } catch (e) {
       throw new Error(e.message)
