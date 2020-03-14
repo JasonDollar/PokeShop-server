@@ -15,7 +15,7 @@ module.exports = {
     const me = await User.findOne({ _id: userId }).select('id name email role wallet').populate('wallet')
 
     if (!me) {
-      throw new Error('No user found')
+      return null
     }
     const cart = await CartItem.find({ user: userId }).populate('pokemon')
     await me.populate(['offers']).execPopulate()
@@ -53,6 +53,7 @@ module.exports = {
       if (isAdmin.count <= 0) throw new Error('You don\'t have required permission')
       const users = await User.find().select('-password').populate('wallet')
       console.log(users[0])
+      console.log(users[1])
       return users
     } catch (e) {
       throw new Error(e.message)

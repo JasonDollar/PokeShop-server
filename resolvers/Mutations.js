@@ -24,7 +24,7 @@ module.exports = {
     const newUser = new User({ name, email, password })
     const wallet = new Wallet({ owner: newUser._id })
     const newWallet = await wallet.save()
-    newUser.wallet = newWallet._id
+    newUser.wallet = wallet._id
     const { _id: id } = await newUser.save()
     const token = generateToken(newUser._id, email)
     return {
@@ -181,11 +181,22 @@ module.exports = {
       const isAdmin = await User.count({ _id: userId, role: 'admin' })
       if (isAdmin.count <= 0) throw new Error('You don\'t have required permission')
       const updates = { ...args }
+      
+      let newWallet
+      if (args.wallet) {
+        newWallet = await Wallet.findOneAndUpdate({owner: args.userId}, {balance: args.wallet},  {
+          new: true,
+          runValidators: true,
+        })
+        
+      }
+      updates.wallet = newWallet
       updates.userId = undefined
       const updatedUser = await User.findByIdAndUpdate(args.userId, updates, {
         new: true,
         runValidators: true,
       })
+      await updatedUser.populate('wallet').execPopulate()
       return updatedUser
     } catch (e) {
       throw new Error(e.message)
