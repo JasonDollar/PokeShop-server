@@ -66,7 +66,13 @@ module.exports = {
       
     if (!args.data.name) throw new Error('Please, provide a pokemon name')
 
-    const pokemonRes = await P.resource(`/api/v2/pokemon/${args.data.name}`)
+    try {
+      const pokemonRes = await P.resource(`/api/v2/pokemon/Aegislash`)
+    } catch (e) {
+      console.log(e.message)
+      throw new Error('Could not find this pokemon in a database')
+    }
+    
     const pokemonOffer = new PokemonOffer({
       ...args.data,
       seller: userId,
