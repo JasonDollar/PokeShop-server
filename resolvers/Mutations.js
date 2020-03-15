@@ -72,7 +72,7 @@ module.exports = {
       console.log(e.message)
       throw new Error('Could not find this pokemon in a database')
     }
-    
+
     const pokemonOffer = new PokemonOffer({
       ...args.data,
       seller: userId,
@@ -248,5 +248,22 @@ module.exports = {
       },
       token,
     }
+  },
+  async editPokemonOffer(_parent, { data }, ctx, _info) {
+    const userId = getUserId(ctx)
+
+    if (!userId) {
+      throw new Error('You must be logged in')
+    }
+    const updates = {}
+    if (data.price) updates.price = data.price
+    if (data.description) updates.description = data.description
+    
+    const pokemonOffer = await PokemonOffer.findOneAndUpdate({ _id:data.offerId, seller: userId }, updates, {
+      new: true,
+      runValidators: true,
+    })
+
+    return pokemonOffer
   }
 }

@@ -24,6 +24,7 @@ type Mutation {
   createResetToken(email: String!): SuccessMessage
   resetPassword(resetToken: String!, password: String!, confirmPassword: String!): AuthPayload
   chargeAccountCredits(amount: Int!, token: String): String
+  editPokemonOffer(data: EditOfferInput!): PokemonOffer!
 }
 
 type SuccessMessage {
@@ -34,6 +35,12 @@ type SuccessMessage {
 enum Role {
   admin
   user
+}
+
+input EditOfferInput {
+  offerId: String!
+  price: Int
+  description: String
 }
 
 type User {
